@@ -18,14 +18,8 @@ use crate::utils;
 use heck::SnakeCase;
 use proc_macro2::TokenStream;
 use proc_macro_error::abort;
-use quote::{
-    format_ident,
-    quote,
-};
-use syn::parse::{
-    Parse,
-    ParseStream,
-};
+use quote::{format_ident, quote};
+use syn::parse::{Parse, ParseStream};
 
 mod kw {
     use syn::custom_keyword;
@@ -54,7 +48,7 @@ fn ignore(attrs: &[syn::Attribute]) -> bool {
                     .map_err(|err| abort!("{}", err))
                     .unwrap();
                 if !attrs.attrs.is_empty() {
-                    return true
+                    return true;
                 }
             }
         }
@@ -113,7 +107,7 @@ pub fn module(_args: TokenStream, tokens: TokenStream) -> TokenStream {
         input
     } else {
         // handle #[module(ignore)] by just returning the tokens
-        return tokens
+        return tokens;
     };
 
     // Parse the inner attributes `event_type` and `event_alias` and remove them from the macro
@@ -145,7 +139,7 @@ pub fn module(_args: TokenStream, tokens: TokenStream) -> TokenStream {
     let associated_types = input.items.iter().filter_map(|item| {
         if let syn::TraitItem::Type(ty) = item {
             if ignore(&ty.attrs) {
-                return None
+                return None;
             }
             let ident = &ty.ident;
             let ident_str = ident.to_string();

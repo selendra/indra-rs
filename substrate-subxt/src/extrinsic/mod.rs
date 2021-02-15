@@ -21,32 +21,16 @@ mod signer;
 
 pub use self::{
     extra::{
-        ChargeTransactionPayment,
-        CheckEra,
-        CheckGenesis,
-        CheckNonce,
-        CheckSpecVersion,
-        CheckTxVersion,
-        CheckWeight,
-        DefaultExtra,
-        Extra,
-        SignedExtra,
+        ChargeTransactionPayment, CheckEra, CheckGenesis, CheckNonce, CheckSpecVersion,
+        CheckTxVersion, CheckWeight, DefaultExtra, Extra, SignedExtra,
     },
-    signer::{
-        PairSigner,
-        Signer,
-    },
+    signer::{PairSigner, Signer},
 };
 
 use sp_runtime::traits::SignedExtension;
 use sp_version::RuntimeVersion;
 
-use crate::{
-    frame::system::System,
-    runtimes::Runtime,
-    Encoded,
-    Error,
-};
+use crate::{frame::system::System, runtimes::Runtime, Encoded, Error};
 
 /// UncheckedExtrinsic type.
 pub type UncheckedExtrinsic<T> = sp_runtime::generic::UncheckedExtrinsic<

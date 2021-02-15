@@ -16,24 +16,11 @@
 
 //! Implements support for the pallet_balances module.
 
-use crate::frame::system::{
-    System,
-    SystemEventsDecoder,
-};
-use codec::{
-    Decode,
-    Encode,
-};
+use crate::frame::system::{System, SystemEventsDecoder};
+use codec::{Decode, Encode};
 use core::marker::PhantomData;
-use frame_support::{
-    traits::LockIdentifier,
-    Parameter,
-};
-use sp_runtime::traits::{
-    AtLeast32Bit,
-    MaybeSerialize,
-    Member,
-};
+use frame_support::{traits::LockIdentifier, Parameter};
+use sp_runtime::traits::{AtLeast32Bit, MaybeSerialize, Member};
 use std::fmt::Debug;
 
 /// The subset of the `pallet_balances::Trait` that a client must implement.
@@ -154,27 +141,14 @@ pub struct TransferEvent<T: Balances> {
 mod tests {
     use super::*;
     use crate::{
-        error::{
-            Error,
-            ModuleError,
-            RuntimeError,
-        },
+        error::{Error, ModuleError, RuntimeError},
         events::EventsDecoder,
-        extrinsic::{
-            PairSigner,
-            Signer,
-        },
+        extrinsic::{PairSigner, Signer},
         subscription::EventSubscription,
         system::AccountStoreExt,
-        tests::{
-            test_client,
-            TestRuntime,
-        },
+        tests::{test_client, TestRuntime},
     };
-    use sp_core::{
-        sr25519::Pair,
-        Pair as _,
-    };
+    use sp_core::{sr25519::Pair, Pair as _};
     use sp_keyring::AccountKeyring;
 
     #[async_std::test]
@@ -229,10 +203,7 @@ mod tests {
     #[cfg(feature = "integration-tests")]
     async fn test_state_balance_lock() -> Result<(), crate::Error> {
         use crate::{
-            frame::staking::{
-                BondCallExt,
-                RewardDestination,
-            },
+            frame::staking::{BondCallExt, RewardDestination},
             runtimes::IndracoreRuntime as RT,
             ClientBuilder,
         };

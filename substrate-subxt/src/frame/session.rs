@@ -16,25 +16,13 @@
 
 //! Session support
 use crate::frame::{
-    balances::{
-        Balances,
-        BalancesEventsDecoder as _,
-    },
-    system::{
-        System,
-        SystemEventsDecoder as _,
-    },
+    balances::{Balances, BalancesEventsDecoder as _},
+    system::{System, SystemEventsDecoder as _},
 };
 use codec::Encode;
 use frame_support::Parameter;
-use sp_runtime::traits::{
-    Member,
-    OpaqueKeys,
-};
-use std::{
-    fmt::Debug,
-    marker::PhantomData,
-};
+use sp_runtime::traits::{Member, OpaqueKeys};
+use std::{fmt::Debug, marker::PhantomData};
 use substrate_subxt_proc_macro::Store;
 
 /// Impls `Default::default` for some types that have a `_runtime` field of type

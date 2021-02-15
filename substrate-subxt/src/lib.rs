@@ -53,11 +53,7 @@ use codec::Decode;
 use futures::future;
 use jsonrpsee::client::Subscription;
 use sp_core::{
-    storage::{
-        StorageChangeSet,
-        StorageData,
-        StorageKey,
-    },
+    storage::{StorageChangeSet, StorageData, StorageKey},
     Bytes,
 };
 pub use sp_runtime::traits::SignedExtension;
@@ -75,41 +71,18 @@ mod subscription;
 
 pub use crate::{
     error::Error,
-    events::{
-        EventsDecoder,
-        RawEvent,
-    },
-    extrinsic::{
-        PairSigner,
-        SignedExtra,
-        Signer,
-        UncheckedExtrinsic,
-    },
+    events::{EventsDecoder, RawEvent},
+    extrinsic::{PairSigner, SignedExtra, Signer, UncheckedExtrinsic},
     frame::*,
-    metadata::{
-        Metadata,
-        MetadataError,
-    },
-    rpc::{
-        BlockNumber,
-        ExtrinsicSuccess,
-        ReadProof,
-        SystemProperties,
-    },
+    metadata::{Metadata, MetadataError},
+    rpc::{BlockNumber, ExtrinsicSuccess, ReadProof, SystemProperties},
     runtimes::*,
     subscription::*,
     substrate_subxt_proc_macro::*,
 };
 use crate::{
-    frame::system::{
-        AccountStoreExt,
-        Phase,
-        System,
-    },
-    rpc::{
-        ChainBlock,
-        Rpc,
-    },
+    frame::system::{AccountStoreExt, Phase, System},
+    rpc::{ChainBlock, Rpc},
 };
 
 /// ClientBuilder for constructing a Client.
@@ -222,7 +195,7 @@ impl<T: Runtime, F: Store<T>> KeyIter<T, F> {
     pub async fn next(&mut self) -> Result<Option<(StorageKey, F::Returns)>, Error> {
         loop {
             if let Some((k, v)) = self.buffer.pop() {
-                return Ok(Some((k, Decode::decode(&mut &v.0[..])?)))
+                return Ok(Some((k, Decode::decode(&mut &v.0[..])?)));
             } else {
                 let keys = self
                     .client
@@ -230,7 +203,7 @@ impl<T: Runtime, F: Store<T>> KeyIter<T, F> {
                     .await?;
 
                 if keys.is_empty() {
-                    return Ok(None)
+                    return Ok(None);
                 }
 
                 self.start_key = keys.last().cloned();
@@ -572,17 +545,10 @@ impl codec::Encode for Encoded {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sp_core::storage::{
-        well_known_keys,
-        StorageKey,
-    };
+    use sp_core::storage::{well_known_keys, StorageKey};
     use sp_keyring::AccountKeyring;
     use substrate_subxt_client::{
-        DatabaseConfig,
-        KeystoreConfig,
-        Role,
-        SubxtClient,
-        SubxtClientConfig,
+        DatabaseConfig, KeystoreConfig, Role, SubxtClient, SubxtClientConfig,
     };
     use tempdir::TempDir;
 
