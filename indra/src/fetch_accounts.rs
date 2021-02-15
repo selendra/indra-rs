@@ -23,3 +23,13 @@ pub fn fetch_all_accounts(url: String) -> Result<(), Error> {
         Ok(())
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_fect_all_account(){
+        assert!(fetch_all_accounts("ws://127.0.0.1:9944".to_string()).is_ok())
+    }
+    
+}

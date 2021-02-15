@@ -1,9 +1,0 @@
-[package]
-name = "balance-sdk"
-version = "0.1.0"
-authors = ["Selendra <info@selendra.org>"]
-edition = "2018"
-repository = "https://github.com/selendra/indracore"
-
-[dependencies]
-subxt = { package = "substrate-subxt", path = "../substrate-subxt" }
