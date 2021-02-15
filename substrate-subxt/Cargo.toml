@@ -1,6 +1,3 @@
-[workspace]
-members = [".", "client", "proc-macro", "test-node"]
-
 [package]
 name = "substrate-subxt"
 version = "0.14.0"

@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "balance",
+]
+
+[profile.release]
+panic = "unwind"
