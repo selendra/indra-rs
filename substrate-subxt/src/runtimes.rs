@@ -312,7 +312,7 @@ impl Balances for KusamaRuntime {
     type Balance = u128;
 }
 
-
+/// Indracore runtime
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct IndracoreRuntime;
 
