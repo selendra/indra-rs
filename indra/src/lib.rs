@@ -1,2 +1,4 @@
+pub mod accounts;
 pub mod get_balance;
-pub mod fetch_accounts;
+pub mod models;
+pub mod utils;
