@@ -73,7 +73,26 @@ pub fn get_account_info(url: &str, account_id: &str) -> Result<Account, Error> {
 mod tests {
     use super::*;
     #[test]
-    fn test_fect_all_account() {
+    fn test_fecth_all_account() {
         assert!(fetch_all_accounts("ws://127.0.0.1:9944").is_ok())
+    }
+
+    #[test]
+    fn test_fecth_account_info() {
+        let account_id = "BauKu2iL4fncgfy22YSLGc1aDLpyuUUe5z8yNF2pDtLNr4E";
+        let info = get_account_info("ws://127.0.0.1:9944", account_id);
+
+        let balance_info = BalanceInfo {
+            free: 0,
+            reserved: 0,
+            misc_frozen: 0,
+            fee_frozen: 0,
+        };
+        let test_info = Account {
+            nonce: 0,
+            refcount: 0,
+            data: balance_info,
+        };
+        assert_ne!(info.unwrap(), test_info);
     }
 }
