@@ -22,6 +22,7 @@ use sp_runtime::{
         BlakeTwo256,
         IdentifyAccount,
         Verify,
+        AccountIdLookup,
     },
     MultiSignature,
     OpaqueExtrinsic,
@@ -309,5 +310,37 @@ impl Session for KusamaRuntime {
 impl Staking for KusamaRuntime {}
 
 impl Balances for KusamaRuntime {
+    type Balance = u128;
+}
+
+/// indracore runtime
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct IndracoreRuntime;
+
+impl Runtime for IndracoreRuntime {
+    type Signature = MultiSignature;
+    type Extra = DefaultExtra<Self>;
+}
+
+impl System for IndracoreRuntime {
+    type Index = u32;
+    type BlockNumber = u32;
+    type Hash = sp_core::H256;
+    type Hashing = BlakeTwo256;
+    type AccountId = <<MultiSignature as Verify>::Signer as IdentifyAccount>::AccountId;
+    type Address = AccountIdLookup<Self::AccountId, ()>;
+    type Header = Header<Self::BlockNumber, BlakeTwo256>;
+    type Extrinsic = OpaqueExtrinsic;
+    type AccountData = AccountData<<Self as Balances>::Balance>;
+}
+
+impl Session for IndracoreRuntime {
+    type ValidatorId = <Self as System>::AccountId;
+    type Keys = SessionKeys;
+}
+
+impl Staking for IndracoreRuntime {}
+
+impl Balances for IndracoreRuntime {
     type Balance = u128;
 }
