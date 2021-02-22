@@ -110,4 +110,12 @@ mod tests {
         };
         assert_ne!(info.unwrap(), test_info);
     }
+
+    #[test]
+    fn test_get_info() {
+        let account_id = "BauKu2iL4fncgfy22YSLGc1aDLpyuUUe5z8yNF2pDtLNr4E";
+        let info = Account::get_account_info("ws://127.0.0.1:9944", account_id).unwrap();
+
+        assert_ne!(info.data.free, 0);
+    }
 }
