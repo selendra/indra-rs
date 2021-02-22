@@ -3,6 +3,7 @@ name = "indra-rs"
 version = "0.1.0"
 authors = ["Selendra <info@selendra.org>"]
 edition = "2018"
+keywords = ["indracore", "substrate"]
 
 [dependencies]
 substrate-subxt = { version = "0.14.0", package = "substrate-subxt", path = "substrate-subxt" }
