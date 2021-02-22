@@ -43,7 +43,7 @@ impl IndraKeyring {
         }
     }
 
-    pub fn multi_address_from_str(accountid: &'static str) ->Result<MultiAddressId, Error>  {
+    pub fn multi_address_from_str(accountid: &'static str) -> Result<MultiAddressId, Error> {
         match sp_runtime::AccountId32::from_str(accountid) {
             Ok(id) => Ok(sp_runtime::MultiAddress::from(id)),
             Err(e) => return Err(Error::Other(e.into())),
@@ -57,7 +57,8 @@ mod test {
 
     #[test]
     fn test_get_pair() {
-        let mnemonic = "plug math bacon find roast scrap shrug exchange announce october exclude plate";
+        let mnemonic =
+            "plug math bacon find roast scrap shrug exchange announce october exclude plate";
         let mnemonic_pair = IndraKeyring::from_str(mnemonic).unwrap();
 
         let seed = "0x9abdf3e8edda03c1708bcd5bc3353e91efd503fd9105ff0ee68a7cbc66b740d8";

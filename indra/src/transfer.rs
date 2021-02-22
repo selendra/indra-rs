@@ -1,5 +1,5 @@
-use substrate_subxt::{balances::*, ClientBuilder, Error, IndracoreRuntime, sp_core::H256};
 use crate::utils::keyring::IndraKeyring;
+use substrate_subxt::{balances::*, sp_core::H256, ClientBuilder, Error, IndracoreRuntime};
 
 #[derive(Debug)]
 pub struct Transfer {
@@ -11,7 +11,12 @@ pub struct Transfer {
 
 impl Transfer {
     pub fn new(url: &'static str, from: &'static str, to: &'static str, amount: u128) -> Self {
-        Self {url, from, to, amount }
+        Self {
+            url,
+            from,
+            to,
+            amount,
+        }
     }
 
     pub fn transfer(&self) -> Result<H256, Error> {
@@ -55,6 +60,6 @@ mod test {
         let from = "0x9abdf3e8edda03c1708bcd5bc3353e91efd503fd9105ff0ee68a7cbc66b740d8";
         let url = "ws://127.0.0.1:9944";
         let data = Transfer::new(url, from, to, 10_0000);
-        let _ = data.transfer();
+        assert!(data.transfer().is_err());
     }
 }
