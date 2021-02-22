@@ -24,7 +24,7 @@ impl Transfer {
                 Ok(c) => c,
                 Err(e) => return Err(e),
             };
-            let from = match IndraKeyring::from_mnemonic(self.from) {
+            let from = match IndraKeyring::from_str(self.from) {
                 Ok(acc) => acc,
                 Err(e) => return Err(e),
             };
@@ -42,5 +42,19 @@ impl Transfer {
             };
             Ok(hash)
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_transfer() {
+        let to = "5FTussKPbMZReFdvL7tu97XzQe7uGqHtcH1PwKN9xCBN2WJ7";
+        let from = "0x9abdf3e8edda03c1708bcd5bc3353e91efd503fd9105ff0ee68a7cbc66b740d8";
+        let url = "ws://127.0.0.1:9944";
+        let data = Transfer::new(url, from, to, 10_0000);
+        let _ = data.transfer();
     }
 }
