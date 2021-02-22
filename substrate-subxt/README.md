@@ -4,7 +4,7 @@ A library to **sub**mit e**xt**rinsics to a [substrate](https://github.com/parit
 
 ## Usage
 
-See [examples](https://github.com/paritytech/substrate-subxt/tree/032ba029af9445e5e1110780166eef73053752e8/examples).
+See [examples](https://github.com/paritytech/substrate-subxt/tree/master/examples).
 
 **Alternatives**
 
