@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -54,14 +54,12 @@ impl<T, P> PairSigner<T, P>
 where
     T: Runtime,
     T::Signature: From<P::Signature>,
-    <T::Signature as Verify>::Signer:
-        From<P::Public> + IdentifyAccount<AccountId = T::AccountId>,
+    <T::Signature as Verify>::Signer: From<P::Public> + IdentifyAccount<AccountId = T::AccountId>,
     P: Pair,
 {
     /// Creates a new `Signer` from a `Pair`.
     pub fn new(signer: P) -> Self {
-        let account_id =
-            <T::Signature as Verify>::Signer::from(signer.public()).into_account();
+        let account_id = <T::Signature as Verify>::Signer::from(signer.public()).into_account();
         Self {
             account_id,
             nonce: None,

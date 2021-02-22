@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@ mod call;
 mod event;
 mod module;
 mod store;
-mod test;
 mod utils;
 
 use proc_macro::TokenStream;
@@ -148,10 +147,4 @@ fn event(s: Structure) -> TokenStream {
 decl_derive!([Store, attributes(store)] => #[proc_macro_error] store);
 fn store(s: Structure) -> TokenStream {
     store::store(s).into()
-}
-
-#[proc_macro]
-#[proc_macro_error]
-pub fn subxt_test(input: TokenStream) -> TokenStream {
-    test::test(input.into()).into()
 }

@@ -1,10 +1,10 @@
-# subxt &middot; ![build](https://github.com/paritytech/substrate-subxt/workflows/Rust/badge.svg) [![Latest Version](https://img.shields.io/crates/v/substrate-subxt.svg)](https://crates.io/crates/substrate-subxt)
+# subxt &middot; ![build](https://github.com/paritytech/substrate-subxt/workflows/Rust/badge.svg) [![Latest Version](https://img.shields.io/crates/v/substrate-subxt.svg)](https://crates.io/crates/substrate-subxt) [![Documentation](https://docs.rs/substrate-subxt/badge.svg)](https://docs.rs/substrate-subxt)
 
 A library to **sub**mit e**xt**rinsics to a [substrate](https://github.com/paritytech/substrate) node via RPC.
 
 ## Usage
 
-See [examples](https://github.com/paritytech/substrate-subxt/tree/master/examples).
+See [examples](https://github.com/paritytech/substrate-subxt/tree/032ba029af9445e5e1110780166eef73053752e8/examples).
 
 **Alternatives**
 
@@ -18,7 +18,7 @@ useful for testing and ci.
 #### License
 
 <sup>
-The entire code within this repository is licensed under the <a href="https://github.com/paritytech/substrate-subxt/blob/master/LICENSE">GPLv3</a>.
+The entire code within this repository is licensed under the <a href="LICENSE">GPLv3</a>.
 Please <a href="https://www.parity.io/contact/">contact us</a> if you have questions about the licensing of our
  products.
 </sup>

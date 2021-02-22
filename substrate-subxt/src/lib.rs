@@ -279,10 +279,7 @@ impl<T: Runtime> Client<T> {
     }
 
     /// Returns an iterator of key value pairs.
-    pub async fn iter<F: Store<T>>(
-        &self,
-        hash: Option<T::Hash>,
-    ) -> Result<KeyIter<T, F>, Error> {
+    pub async fn iter<F: Store<T>>(&self, hash: Option<T::Hash>) -> Result<KeyIter<T, F>, Error> {
         let hash = if let Some(hash) = hash {
             hash
         } else {
@@ -374,9 +371,7 @@ impl<T: Runtime> Client<T> {
     }
 
     /// Subscribe to events.
-    pub async fn subscribe_events(
-        &self,
-    ) -> Result<Subscription<StorageChangeSet<T::Hash>>, Error> {
+    pub async fn subscribe_events(&self) -> Result<Subscription<StorageChangeSet<T::Hash>>, Error> {
         let events = self.rpc.subscribe_events().await?;
         Ok(events)
     }
@@ -388,9 +383,7 @@ impl<T: Runtime> Client<T> {
     }
 
     /// Subscribe to finalized blocks.
-    pub async fn subscribe_finalized_blocks(
-        &self,
-    ) -> Result<Subscription<T::Header>, Error> {
+    pub async fn subscribe_finalized_blocks(&self) -> Result<Subscription<T::Header>, Error> {
         let headers = self.rpc.subscribe_finalized_blocks().await?;
         Ok(headers)
     }
@@ -419,8 +412,7 @@ impl<T: Runtime> Client<T> {
         signer: &(dyn Signer<T> + Send + Sync),
     ) -> Result<UncheckedExtrinsic<T>, Error>
     where
-        <<T::Extra as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned:
-            Send + Sync,
+        <<T::Extra as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
     {
         let account_nonce = if let Some(nonce) = signer.nonce() {
             nonce
@@ -473,8 +465,7 @@ impl<T: Runtime> Client<T> {
         signer: &(dyn Signer<T> + Send + Sync),
     ) -> Result<T::Hash, Error>
     where
-        <<T::Extra as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned:
-            Send + Sync,
+        <<T::Extra as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
     {
         let extrinsic = self.create_signed(call, signer).await?;
         self.submit_extrinsic(extrinsic).await
@@ -487,8 +478,7 @@ impl<T: Runtime> Client<T> {
         signer: &(dyn Signer<T> + Send + Sync),
     ) -> Result<ExtrinsicSuccess<T>, Error>
     where
-        <<T::Extra as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned:
-            Send + Sync,
+        <<T::Extra as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
     {
         let extrinsic = self.create_signed(call, signer).await?;
         let decoder = self.events_decoder::<C>();
@@ -522,11 +512,7 @@ impl<T: Runtime> Client<T> {
     /// Checks if the keystore has private keys for the given public key and key type.
     ///
     /// Returns `true` if a private key could be found.
-    pub async fn has_key(
-        &self,
-        public_key: Bytes,
-        key_type: String,
-    ) -> Result<bool, Error> {
+    pub async fn has_key(&self, public_key: Bytes, key_type: String) -> Result<bool, Error> {
         self.rpc.has_key(public_key, key_type).await
     }
 }
@@ -539,181 +525,5 @@ pub struct Encoded(pub Vec<u8>);
 impl codec::Encode for Encoded {
     fn encode(&self) -> Vec<u8> {
         self.0.to_owned()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use sp_core::storage::{well_known_keys, StorageKey};
-    use sp_keyring::AccountKeyring;
-    use substrate_subxt_client::{
-        DatabaseConfig, KeystoreConfig, Role, SubxtClient, SubxtClientConfig,
-    };
-    use tempdir::TempDir;
-
-    pub(crate) type TestRuntime = crate::NodeTemplateRuntime;
-
-    pub(crate) async fn test_client_with(
-        key: AccountKeyring,
-    ) -> (Client<TestRuntime>, TempDir) {
-        env_logger::try_init().ok();
-        let tmp = TempDir::new("subxt-").expect("failed to create tempdir");
-        let config = SubxtClientConfig {
-            impl_name: "substrate-subxt-full-client",
-            impl_version: "0.0.1",
-            author: "substrate subxt",
-            copyright_start_year: 2020,
-            db: DatabaseConfig::RocksDb {
-                path: tmp.path().join("db"),
-                cache_size: 128,
-            },
-            keystore: KeystoreConfig::Path {
-                path: tmp.path().join("keystore"),
-                password: None,
-            },
-            chain_spec: test_node::chain_spec::development_config().unwrap(),
-            role: Role::Authority(key),
-            telemetry: None,
-        };
-        let client = ClientBuilder::new()
-            .set_client(
-                SubxtClient::from_config(config, test_node::service::new_full)
-                    .expect("Error creating subxt client"),
-            )
-            .set_page_size(3)
-            .build()
-            .await
-            .expect("Error creating client");
-        (client, tmp)
-    }
-
-    pub(crate) async fn test_client() -> (Client<TestRuntime>, TempDir) {
-        test_client_with(AccountKeyring::Alice).await
-    }
-
-    #[async_std::test]
-    async fn test_insert_key() {
-        // Bob is not an authority, so block production should be disabled.
-        let (client, _tmp) = test_client_with(AccountKeyring::Bob).await;
-        let mut blocks = client.subscribe_blocks().await.unwrap();
-        // get the genesis block.
-        assert_eq!(blocks.next().await.number, 0);
-        let public = AccountKeyring::Alice.public().as_array_ref().to_vec();
-        client
-            .insert_key(
-                "aura".to_string(),
-                "//Alice".to_string(),
-                public.clone().into(),
-            )
-            .await
-            .unwrap();
-        assert!(client
-            .has_key(public.clone().into(), "aura".to_string())
-            .await
-            .unwrap());
-        // Alice is an authority, so blocks should be produced.
-        assert_eq!(blocks.next().await.number, 1);
-    }
-
-    #[async_std::test]
-    async fn test_tx_transfer_balance() {
-        let mut signer = PairSigner::new(AccountKeyring::Alice.pair());
-        let dest = AccountKeyring::Bob.to_account_id().into();
-
-        let (client, _) = test_client().await;
-        let nonce = client
-            .account(&AccountKeyring::Alice.to_account_id(), None)
-            .await
-            .unwrap()
-            .nonce;
-        signer.set_nonce(nonce);
-        client
-            .submit(
-                balances::TransferCall {
-                    to: &dest,
-                    amount: 10_000,
-                },
-                &signer,
-            )
-            .await
-            .unwrap();
-
-        // check that nonce is handled correctly
-        signer.increment_nonce();
-        client
-            .submit(
-                balances::TransferCall {
-                    to: &dest,
-                    amount: 10_000,
-                },
-                &signer,
-            )
-            .await
-            .unwrap();
-    }
-
-    #[async_std::test]
-    async fn test_getting_hash() {
-        let (client, _) = test_client().await;
-        client.block_hash(None).await.unwrap();
-    }
-
-    #[async_std::test]
-    async fn test_getting_block() {
-        let (client, _) = test_client().await;
-        let block_hash = client.block_hash(None).await.unwrap();
-        client.block(block_hash).await.unwrap();
-    }
-
-    #[async_std::test]
-    async fn test_getting_read_proof() {
-        let (client, _) = test_client().await;
-        let block_hash = client.block_hash(None).await.unwrap();
-        client
-            .read_proof(
-                vec![
-                    StorageKey(well_known_keys::HEAP_PAGES.to_vec()),
-                    StorageKey(well_known_keys::EXTRINSIC_INDEX.to_vec()),
-                ],
-                block_hash,
-            )
-            .await
-            .unwrap();
-    }
-
-    #[async_std::test]
-    async fn test_chain_subscribe_blocks() {
-        let (client, _) = test_client().await;
-        let mut blocks = client.subscribe_blocks().await.unwrap();
-        blocks.next().await;
-    }
-
-    #[async_std::test]
-    async fn test_chain_subscribe_finalized_blocks() {
-        let (client, _) = test_client().await;
-        let mut blocks = client.subscribe_finalized_blocks().await.unwrap();
-        blocks.next().await;
-    }
-
-    #[async_std::test]
-    async fn test_fetch_keys() {
-        let (client, _) = test_client().await;
-        let keys = client
-            .fetch_keys::<system::AccountStore<_>>(4, None, None)
-            .await
-            .unwrap();
-        assert_eq!(keys.len(), 4)
-    }
-
-    #[async_std::test]
-    async fn test_iter() {
-        let (client, _) = test_client().await;
-        let mut iter = client.iter::<system::AccountStore<_>>(None).await.unwrap();
-        let mut i = 0;
-        while let Some(_) = iter.next().await.unwrap() {
-            i += 1;
-        }
-        assert_eq!(i, 4);
     }
 }

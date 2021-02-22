@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -56,9 +56,7 @@ where
     type Call = ();
     type AdditionalSigned = u32;
     type Pre = ();
-    fn additional_signed(
-        &self,
-    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+    fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
         Ok(self.1)
     }
 }
@@ -86,9 +84,7 @@ where
     type Call = ();
     type AdditionalSigned = u32;
     type Pre = ();
-    fn additional_signed(
-        &self,
-    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+    fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
         Ok(self.1)
     }
 }
@@ -116,9 +112,7 @@ where
     type Call = ();
     type AdditionalSigned = T::Hash;
     type Pre = ();
-    fn additional_signed(
-        &self,
-    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+    fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
         Ok(self.1)
     }
 }
@@ -148,9 +142,7 @@ where
     type Call = ();
     type AdditionalSigned = T::Hash;
     type Pre = ();
-    fn additional_signed(
-        &self,
-    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+    fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
         Ok(self.1)
     }
 }
@@ -168,9 +160,7 @@ where
     type Call = ();
     type AdditionalSigned = ();
     type Pre = ();
-    fn additional_signed(
-        &self,
-    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+    fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
         Ok(())
     }
 }
@@ -188,9 +178,7 @@ where
     type Call = ();
     type AdditionalSigned = ();
     type Pre = ();
-    fn additional_signed(
-        &self,
-    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+    fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
         Ok(())
     }
 }
@@ -209,9 +197,7 @@ where
     type Call = ();
     type AdditionalSigned = ();
     type Pre = ();
-    fn additional_signed(
-        &self,
-    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+    fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
         Ok(())
     }
 }
@@ -222,12 +208,7 @@ pub trait SignedExtra<T: System>: SignedExtension {
     type Extra: SignedExtension + Send + Sync;
 
     /// Creates a new `SignedExtra`.
-    fn new(
-        spec_version: u32,
-        tx_version: u32,
-        nonce: T::Index,
-        genesis_hash: T::Hash,
-    ) -> Self;
+    fn new(spec_version: u32, tx_version: u32, nonce: T::Index, genesis_hash: T::Hash) -> Self;
 
     /// Returns the transaction extra.
     fn extra(&self) -> Self::Extra;
@@ -242,9 +223,7 @@ pub struct DefaultExtra<T: System> {
     genesis_hash: T::Hash,
 }
 
-impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T>
-    for DefaultExtra<T>
-{
+impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T> for DefaultExtra<T> {
     type Extra = (
         CheckSpecVersion<T>,
         CheckTxVersion<T>,
@@ -255,12 +234,7 @@ impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T>
         ChargeTransactionPayment<T>,
     );
 
-    fn new(
-        spec_version: u32,
-        tx_version: u32,
-        nonce: T::Index,
-        genesis_hash: T::Hash,
-    ) -> Self {
+    fn new(spec_version: u32, tx_version: u32, nonce: T::Index, genesis_hash: T::Hash) -> Self {
         DefaultExtra {
             spec_version,
             tx_version,
@@ -282,19 +256,14 @@ impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtra<T>
     }
 }
 
-impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtension
-    for DefaultExtra<T>
-{
+impl<T: System + Balances + Clone + Debug + Eq + Send + Sync> SignedExtension for DefaultExtra<T> {
     const IDENTIFIER: &'static str = "DefaultExtra";
     type AccountId = T::AccountId;
     type Call = ();
-    type AdditionalSigned =
-        <<Self as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned;
+    type AdditionalSigned = <<Self as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned;
     type Pre = ();
 
-    fn additional_signed(
-        &self,
-    ) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+    fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
         self.extra().additional_signed()
     }
 }

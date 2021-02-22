@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -48,8 +48,7 @@ use crate::{
     subscription::EventSubscription,
 };
 
-pub type ChainBlock<T> =
-    SignedBlock<Block<<T as System>::Header, <T as System>::Extrinsic>>;
+pub type ChainBlock<T> = SignedBlock<Block<<T as System>::Header, <T as System>::Extrinsic>>;
 
 /// Wrapper for NumberOrHex to allow custom From impls
 #[derive(Serialize)]
@@ -248,10 +247,7 @@ impl<T: Runtime> Rpc<T> {
     }
 
     /// Get a header
-    pub async fn header(
-        &self,
-        hash: Option<T::Hash>,
-    ) -> Result<Option<T::Header>, Error> {
+    pub async fn header(&self, hash: Option<T::Hash>) -> Result<Option<T::Header>, Error> {
         let params = Params::Array(vec![to_json_value(hash)?]);
         let header = self.client.request("chain_getHeader", params).await?;
         Ok(header)
@@ -281,10 +277,7 @@ impl<T: Runtime> Rpc<T> {
     }
 
     /// Get a Block
-    pub async fn block(
-        &self,
-        hash: Option<T::Hash>,
-    ) -> Result<Option<ChainBlock<T>>, Error> {
+    pub async fn block(&self, hash: Option<T::Hash>) -> Result<Option<ChainBlock<T>>, Error> {
         let params = Params::Array(vec![to_json_value(hash)?]);
         let block = self.client.request("chain_getBlock", params).await?;
         Ok(block)
@@ -302,10 +295,7 @@ impl<T: Runtime> Rpc<T> {
     }
 
     /// Fetch the runtime version
-    pub async fn runtime_version(
-        &self,
-        at: Option<T::Hash>,
-    ) -> Result<RuntimeVersion, Error> {
+    pub async fn runtime_version(&self, at: Option<T::Hash>) -> Result<RuntimeVersion, Error> {
         let params = Params::Array(vec![to_json_value(at)?]);
         let version = self
             .client
@@ -315,9 +305,7 @@ impl<T: Runtime> Rpc<T> {
     }
 
     /// Subscribe to substrate System Events
-    pub async fn subscribe_events(
-        &self,
-    ) -> Result<Subscription<StorageChangeSet<T::Hash>>, Error> {
+    pub async fn subscribe_events(&self) -> Result<Subscription<StorageChangeSet<T::Hash>>, Error> {
         let mut storage_key = twox_128(b"System").to_vec();
         storage_key.extend(twox_128(b"Events").to_vec());
         log::debug!("Events storage key {:?}", hex::encode(&storage_key));
@@ -347,9 +335,7 @@ impl<T: Runtime> Rpc<T> {
     }
 
     /// Subscribe to finalized blocks.
-    pub async fn subscribe_finalized_blocks(
-        &self,
-    ) -> Result<Subscription<T::Header>, Error> {
+    pub async fn subscribe_finalized_blocks(&self) -> Result<Subscription<T::Header>, Error> {
         let subscription = self
             .client
             .subscribe(
@@ -362,10 +348,7 @@ impl<T: Runtime> Rpc<T> {
     }
 
     /// Create and submit an extrinsic and return corresponding Hash if successful
-    pub async fn submit_extrinsic<E: Encode>(
-        &self,
-        extrinsic: E,
-    ) -> Result<T::Hash, Error> {
+    pub async fn submit_extrinsic<E: Encode>(&self, extrinsic: E) -> Result<T::Hash, Error> {
         let bytes: Bytes = extrinsic.encode().into();
         let params = Params::Array(vec![to_json_value(bytes)?]);
         let xt_hash = self
@@ -447,21 +430,15 @@ impl<T: Runtime> Rpc<T> {
                                 events,
                             })
                         }
-                        None => {
-                            Err(format!("Failed to find block {:?}", block_hash).into())
-                        }
+                        None => Err(format!("Failed to find block {:?}", block_hash).into()),
                     };
                 }
                 TransactionStatus::Invalid => return Err("Extrinsic Invalid".into()),
                 TransactionStatus::Usurped(_) => return Err("Extrinsic Usurped".into()),
                 TransactionStatus::Dropped => return Err("Extrinsic Dropped".into()),
-                TransactionStatus::Retracted(_) => {
-                    return Err("Extrinsic Retracted".into())
-                }
+                TransactionStatus::Retracted(_) => return Err("Extrinsic Retracted".into()),
                 // should have made it `InBlock` before either of these
-                TransactionStatus::Finalized(_) => {
-                    return Err("Extrinsic Finalized".into())
-                }
+                TransactionStatus::Finalized(_) => return Err("Extrinsic Finalized".into()),
                 TransactionStatus::FinalityTimeout(_) => {
                     return Err("Extrinsic FinalityTimeout".into())
                 }
@@ -507,13 +484,8 @@ impl<T: Runtime> Rpc<T> {
     /// Checks if the keystore has private keys for the given public key and key type.
     ///
     /// Returns `true` if a private key could be found.
-    pub async fn has_key(
-        &self,
-        public_key: Bytes,
-        key_type: String,
-    ) -> Result<bool, Error> {
-        let params =
-            Params::Array(vec![to_json_value(public_key)?, to_json_value(key_type)?]);
+    pub async fn has_key(&self, public_key: Bytes, key_type: String) -> Result<bool, Error> {
+        let params = Params::Array(vec![to_json_value(public_key)?, to_json_value(key_type)?]);
         Ok(self.client.request("author_hasKey", params).await?)
     }
 }

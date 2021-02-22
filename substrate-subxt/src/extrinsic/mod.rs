@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -53,8 +53,7 @@ pub async fn create_signed<T>(
 ) -> Result<UncheckedExtrinsic<T>, Error>
 where
     T: Runtime,
-    <<T::Extra as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned:
-        Send + Sync,
+    <<T::Extra as SignedExtra<T>>::Extra as SignedExtension>::AdditionalSigned: Send + Sync,
 {
     let spec_version = runtime_version.spec_version;
     let tx_version = runtime_version.transaction_version;

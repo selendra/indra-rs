@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -212,28 +212,5 @@ impl<A: Parse> Parse for UniAttr<A> {
         let paren = syn::parenthesized!(content in input);
         let attr = content.parse()?;
         Ok(Self { paren, attr })
-    }
-}
-
-#[cfg(test)]
-pub(crate) fn assert_proc_macro(
-    result: proc_macro2::TokenStream,
-    expected: proc_macro2::TokenStream,
-) {
-    let result = result.to_string();
-    let expected = expected.to_string();
-    pretty_assertions::assert_eq!(result, expected);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_parse_option() {
-        let option_t: syn::Type = syn::parse2(quote!(Option<T>)).unwrap();
-        let t: syn::Type = syn::parse2(quote!(T)).unwrap();
-        assert_eq!(parse_option(&option_t), Some(t.clone()));
-        assert_eq!(parse_option(&t), None);
     }
 }

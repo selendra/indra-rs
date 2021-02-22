@@ -102,10 +102,7 @@ impl Metadata {
     }
 
     /// Returns `ModuleWithEvents`.
-    pub fn module_with_events(
-        &self,
-        module_index: u8,
-    ) -> Result<&ModuleWithEvents, MetadataError> {
+    pub fn module_with_events(&self, module_index: u8) -> Result<&ModuleWithEvents, MetadataError> {
         self.modules_with_events
             .values()
             .find(|&module| module.index == module_index)
@@ -113,10 +110,7 @@ impl Metadata {
     }
 
     /// Returns `ModuleWithErrors`.
-    pub fn module_with_errors(
-        &self,
-        module_index: u8,
-    ) -> Result<&ModuleWithErrors, MetadataError> {
+    pub fn module_with_errors(&self, module_index: u8) -> Result<&ModuleWithErrors, MetadataError> {
         self.modules_with_errors
             .values()
             .find(|&module| module.index == module_index)
@@ -169,10 +163,7 @@ impl ModuleMetadata {
     }
 
     /// Get a constant's metadata by name
-    pub fn constant(
-        &self,
-        key: &'static str,
-    ) -> Result<&ModuleConstantMetadata, MetadataError> {
+    pub fn constant(&self, key: &'static str) -> Result<&ModuleConstantMetadata, MetadataError> {
         self.constants
             .get(key)
             .ok_or(MetadataError::ConstantNotFound(key))
@@ -529,11 +520,8 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
                 let module_prefix = convert(storage.prefix)?;
                 for entry in convert(storage.entries)?.into_iter() {
                     let storage_prefix = convert(entry.name.clone())?;
-                    let entry = convert_entry(
-                        module_prefix.clone(),
-                        storage_prefix.clone(),
-                        entry,
-                    )?;
+                    let entry =
+                        convert_entry(module_prefix.clone(), storage_prefix.clone(), entry)?;
                     storage_map.insert(storage_prefix, entry);
                 }
             }
@@ -597,9 +585,7 @@ impl TryFrom<RuntimeMetadataPrefixed> for Metadata {
     }
 }
 
-fn convert<B: 'static, O: 'static>(
-    dd: DecodeDifferent<B, O>,
-) -> Result<O, ConversionError> {
+fn convert<B: 'static, O: 'static>(dd: DecodeDifferent<B, O>) -> Result<O, ConversionError> {
     match dd {
         DecodeDifferent::Decoded(value) => Ok(value),
         _ => Err(ConversionError::ExpectedDecoded),
@@ -633,9 +619,7 @@ fn convert_entry(
     })
 }
 
-fn convert_error(
-    error: frame_metadata::ErrorMetadata,
-) -> Result<String, ConversionError> {
+fn convert_error(error: frame_metadata::ErrorMetadata) -> Result<String, ConversionError> {
     convert(error.name)
 }
 

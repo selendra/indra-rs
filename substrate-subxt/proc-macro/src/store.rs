@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -76,9 +76,7 @@ pub fn store(s: Structure) -> TokenStream {
         .iter()
         .filter_map(|bi| bi.ast().attrs.iter().filter_map(parse_returns_attr).next())
         .next()
-        .unwrap_or_else(|| {
-            abort!(ident, "#[store(returns = ..)] needs to be specified.")
-        });
+        .unwrap_or_else(|| abort!(ident, "#[store(returns = ..)] needs to be specified."));
     let fetch = if uses_default {
         quote!(fetch_or_default)
     } else {
@@ -164,86 +162,5 @@ pub fn store(s: Structure) -> TokenStream {
                 Box::pin(self.iter(hash))
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_account_store() {
-        let input = quote! {
-            #[derive(Encode, Store)]
-            pub struct AccountStore<'a, T: Balances> {
-                #[store(returns = AccountData<T::Balance>)]
-                account_id: &'a <T as System>::AccountId,
-            }
-        };
-        let expected = quote! {
-            impl<'a, T: Balances> substrate_subxt::Store<T> for AccountStore<'a, T> {
-                const MODULE: &'static str = MODULE;
-                const FIELD: &'static str = "Account";
-                type Returns = AccountData<T::Balance>;
-
-                fn prefix(
-                    metadata: &substrate_subxt::Metadata,
-                ) -> Result<substrate_subxt::sp_core::storage::StorageKey, substrate_subxt::MetadataError> {
-                    Ok(metadata
-                        .module(Self::MODULE)?
-                        .storage(Self::FIELD)?
-                        .prefix())
-                }
-
-                fn key(
-                    &self,
-                    metadata: &substrate_subxt::Metadata,
-                ) -> Result<substrate_subxt::sp_core::storage::StorageKey, substrate_subxt::MetadataError> {
-                    Ok(metadata
-                        .module(Self::MODULE)?
-                        .storage(Self::FIELD)?
-                        .map()?
-                        .key(&self.account_id,))
-                }
-            }
-
-            /// Store extension trait.
-            pub trait AccountStoreExt<T: substrate_subxt::Runtime + Balances> {
-                /// Retrieve the store element.
-                fn account<'a>(
-                    &'a self,
-                    account_id: &'a <T as System>::AccountId,
-                    hash: Option<T::Hash>,
-                ) -> core::pin::Pin<Box<dyn core::future::Future<Output = Result<AccountData<T::Balance>, substrate_subxt::Error>> + Send + 'a>>;
-                /// Iterate over the store element.
-                fn account_iter<'a>(
-                    &'a self,
-                    hash: Option<T::Hash>,
-                ) -> core::pin::Pin<Box<dyn core::future::Future<Output = Result<substrate_subxt::KeyIter<T, AccountStore<'a, T>>, substrate_subxt::Error>> + Send + 'a>>;
-            }
-
-            impl<T: substrate_subxt::Runtime + Balances> AccountStoreExt<T> for substrate_subxt::Client<T> {
-                fn account<'a>(
-                    &'a self,
-                    account_id: &'a <T as System>::AccountId,
-                    hash: Option<T::Hash>,
-                ) -> core::pin::Pin<Box<dyn core::future::Future<Output = Result<AccountData<T::Balance>, substrate_subxt::Error>> + Send + 'a>>
-                {
-                    let _ = core::marker::PhantomData::<T>;
-                    Box::pin(async move { self.fetch_or_default(&AccountStore { account_id, }, hash).await })
-                }
-
-                fn account_iter<'a>(
-                    &'a self,
-                    hash: Option<T::Hash>,
-                ) -> core::pin::Pin<Box<dyn core::future::Future<Output = Result<substrate_subxt::KeyIter<T, AccountStore<'a, T>>, substrate_subxt::Error>> + Send + 'a>> {
-                    Box::pin(self.iter(hash))
-                }
-            }
-        };
-        let derive_input = syn::parse2(input).unwrap();
-        let s = Structure::new(&derive_input);
-        let result = store(s);
-        utils::assert_proc_macro(result, expected);
     }
 }

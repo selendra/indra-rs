@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -49,60 +49,4 @@ pub struct SudoUncheckedWeightCall<'a, T: Sudo> {
     /// This argument is actually unused in runtime, you can pass any value of
     /// `Weight` type when using this call.
     pub weight: Weight,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::{
-        error::{Error, RuntimeError},
-        extrinsic::PairSigner,
-        frame::balances::TransferCall,
-        tests::{test_client, TestRuntime},
-    };
-    use sp_keyring::AccountKeyring;
-
-    #[async_std::test]
-    async fn test_sudo() {
-        env_logger::try_init().ok();
-        let alice = PairSigner::<TestRuntime, _>::new(AccountKeyring::Alice.pair());
-        let (client, _) = test_client().await;
-
-        let call = client
-            .encode(TransferCall {
-                to: &AccountKeyring::Bob.to_account_id(),
-                amount: 10_000,
-            })
-            .unwrap();
-
-        let res = client.sudo_and_watch(&alice, &call).await;
-        assert!(if let Err(Error::Runtime(RuntimeError::BadOrigin)) = res {
-            true
-        } else {
-            false
-        });
-    }
-
-    #[async_std::test]
-    async fn test_sudo_unchecked_weight() {
-        env_logger::try_init().ok();
-        let alice = PairSigner::<TestRuntime, _>::new(AccountKeyring::Alice.pair());
-        let (client, _) = test_client().await;
-
-        let call = client
-            .encode(TransferCall {
-                to: &AccountKeyring::Bob.to_account_id(),
-                amount: 10_000,
-            })
-            .unwrap();
-
-        let res = client
-            .sudo_unchecked_weight_and_watch(&alice, &call, 0u64)
-            .await;
-        assert!(if let Err(Error::Runtime(RuntimeError::BadOrigin)) = res {
-            true
-        } else {
-            false
-        });
-    }
 }

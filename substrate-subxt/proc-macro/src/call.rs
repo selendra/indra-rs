@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -91,81 +91,5 @@ pub fn call(s: Structure) -> TokenStream {
                 Box::pin(self.watch(#build_struct, signer))
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_transfer_call() {
-        let input = quote! {
-            #[derive(Call, Encode)]
-            pub struct TransferCall<'a, T: Balances> {
-                pub to: &'a <T as System>::Address,
-                #[codec(compact)]
-                pub amount: T::Balance,
-            }
-        };
-        let expected = quote! {
-            impl<'a, T: Balances> substrate_subxt::Call<T> for TransferCall<'a, T> {
-                const MODULE: &'static str = MODULE;
-                const FUNCTION: &'static str = "transfer";
-                fn events_decoder(
-                    decoder: &mut substrate_subxt::EventsDecoder<T>,
-                ) {
-                    decoder.with_balances();
-                }
-            }
-
-            /// Call extension trait.
-            pub trait TransferCallExt<T: substrate_subxt::Runtime + Balances> {
-                /// Create and submit an extrinsic.
-                fn transfer<'a>(
-                    &'a self,
-                    signer: &'a (dyn substrate_subxt::Signer<T> + Send + Sync),
-                    to: &'a <T as System>::Address,
-                    amount: T::Balance,
-                ) -> core::pin::Pin<Box<dyn core::future::Future<Output = Result<T::Hash, substrate_subxt::Error>> + Send + 'a>>;
-
-                /// Create, submit and watch an extrinsic.
-                fn transfer_and_watch<'a>(
-                    &'a self,
-                    signer: &'a (dyn substrate_subxt::Signer<T> + Send + Sync),
-                    to: &'a <T as System>::Address,
-                    amount: T::Balance,
-                ) -> core::pin::Pin<Box<dyn core::future::Future<Output = Result<substrate_subxt::ExtrinsicSuccess<T>, substrate_subxt::Error>> + Send + 'a>>;
-            }
-
-            impl<T: substrate_subxt::Runtime + Balances> TransferCallExt<T> for substrate_subxt::Client<T>
-            where
-                <<T::Extra as substrate_subxt::SignedExtra<T>>::Extra as substrate_subxt::SignedExtension>::AdditionalSigned: Send + Sync,
-            {
-                fn transfer<'a>(
-                    &'a self,
-                    signer: &'a (dyn substrate_subxt::Signer<T> + Send + Sync),
-                    to: &'a <T as System>::Address,
-                    amount: T::Balance,
-                ) -> core::pin::Pin<Box<dyn core::future::Future<Output = Result<T::Hash, substrate_subxt::Error>> + Send + 'a>> {
-                    let _ = core::marker::PhantomData::<T>;
-                    Box::pin(self.submit(TransferCall { to, amount, }, signer))
-                }
-
-                fn transfer_and_watch<'a>(
-                    &'a self,
-                    signer: &'a (dyn substrate_subxt::Signer<T> + Send + Sync),
-                    to: &'a <T as System>::Address,
-                    amount: T::Balance,
-                ) -> core::pin::Pin<Box<dyn core::future::Future<Output = Result<substrate_subxt::ExtrinsicSuccess<T>, substrate_subxt::Error>> + Send + 'a>> {
-                    let _ = core::marker::PhantomData::<T>;
-                    Box::pin(self.watch(TransferCall { to, amount, }, signer))
-                }
-            }
-        };
-        let derive_input = syn::parse2(input).unwrap();
-        let s = Structure::new(&derive_input);
-        let result = call(s);
-        utils::assert_proc_macro(result, expected);
     }
 }

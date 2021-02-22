@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -183,15 +183,9 @@ impl<T: System> EventsDecoder<T> {
                         output.push_byte(1);
                         self.decode_raw_bytes(&[*arg.clone()], input, output, errors)?
                     }
-                    _ => {
-                        return Err(Error::Other(
-                            "unexpected first byte decoding Option".into(),
-                        ))
-                    }
+                    _ => return Err(Error::Other("unexpected first byte decoding Option".into())),
                 },
-                EventArg::Tuple(args) => {
-                    self.decode_raw_bytes(args, input, output, errors)?
-                }
+                EventArg::Tuple(args) => self.decode_raw_bytes(args, input, output, errors)?,
                 EventArg::Primitive(name) => {
                     let result = match name.as_str() {
                         "DispatchResult" => DispatchResult::decode(input)?,
@@ -284,113 +278,4 @@ pub enum Raw {
     Event(RawEvent),
     /// Error
     Error(RuntimeError),
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use frame_metadata::{
-        DecodeDifferent, ErrorMetadata, EventMetadata, ExtrinsicMetadata, ModuleMetadata,
-        RuntimeMetadata, RuntimeMetadataPrefixed, RuntimeMetadataV12, META_RESERVED,
-    };
-    use std::convert::TryFrom;
-
-    type TestRuntime = crate::NodeTemplateRuntime;
-
-    #[test]
-    fn test_decode_option() {
-        let decoder = EventsDecoder::<TestRuntime>::new(Metadata::default());
-
-        let value = Some(0u8);
-        let input = value.encode();
-        let mut output = Vec::<u8>::new();
-        let mut errors = Vec::<RuntimeError>::new();
-
-        decoder
-            .decode_raw_bytes(
-                &[EventArg::Option(Box::new(EventArg::Primitive(
-                    "u8".to_string(),
-                )))],
-                &mut &input[..],
-                &mut output,
-                &mut errors,
-            )
-            .unwrap();
-
-        assert_eq!(output, vec![1, 0]);
-    }
-
-    #[test]
-    fn test_decode_system_events_and_error() {
-        let decoder = EventsDecoder::<TestRuntime>::new(
-            Metadata::try_from(RuntimeMetadataPrefixed(
-                META_RESERVED,
-                RuntimeMetadata::V12(RuntimeMetadataV12 {
-                    modules: DecodeDifferent::Decoded(vec![ModuleMetadata {
-                        name: DecodeDifferent::Decoded("System".to_string()),
-                        storage: None,
-                        calls: None,
-                        event: Some(DecodeDifferent::Decoded(vec![
-                            EventMetadata {
-                                name: DecodeDifferent::Decoded(
-                                    "ExtrinsicSuccess".to_string(),
-                                ),
-                                arguments: DecodeDifferent::Decoded(vec![
-                                    "DispatchInfo".to_string()
-                                ]),
-                                documentation: DecodeDifferent::Decoded(vec![]),
-                            },
-                            EventMetadata {
-                                name: DecodeDifferent::Decoded(
-                                    "ExtrinsicFailed".to_string(),
-                                ),
-                                arguments: DecodeDifferent::Decoded(vec![
-                                    "DispatchError".to_string(),
-                                    "DispatchInfo".to_string(),
-                                ]),
-                                documentation: DecodeDifferent::Decoded(vec![]),
-                            },
-                        ])),
-                        constants: DecodeDifferent::Decoded(vec![]),
-                        errors: DecodeDifferent::Decoded(vec![
-                            ErrorMetadata {
-                                name: DecodeDifferent::Decoded(
-                                    "InvalidSpecName".to_string(),
-                                ),
-                                documentation: DecodeDifferent::Decoded(vec![]),
-                            },
-                            ErrorMetadata {
-                                name: DecodeDifferent::Decoded(
-                                    "SpecVersionNeedsToIncrease".to_string(),
-                                ),
-                                documentation: DecodeDifferent::Decoded(vec![]),
-                            },
-                            ErrorMetadata {
-                                name: DecodeDifferent::Decoded(
-                                    "FailedToExtractRuntimeVersion".to_string(),
-                                ),
-                                documentation: DecodeDifferent::Decoded(vec![]),
-                            },
-                            ErrorMetadata {
-                                name: DecodeDifferent::Decoded(
-                                    "NonDefaultComposite".to_string(),
-                                ),
-                                documentation: DecodeDifferent::Decoded(vec![]),
-                            },
-                        ]),
-                        index: 0,
-                    }]),
-                    extrinsic: ExtrinsicMetadata {
-                        version: 0,
-                        signed_extensions: vec![],
-                    },
-                }),
-            ))
-            .unwrap(),
-        );
-
-        // [(ApplyExtrinsic(0), Event(RawEvent { module: "System", variant: "ExtrinsicSuccess", data: "482d7c09000000000200" })), (ApplyExtrinsic(1), Error(Module(ModuleError { module: "System", error: "NonDefaultComposite" }))), (ApplyExtrinsic(2), Error(Module(ModuleError { module: "System", error: "NonDefaultComposite" })))]
-        let input = hex::decode("0c00000000000000482d7c0900000000020000000100000000010300035884723300000000000000000200000000010300035884723300000000000000").unwrap();
-        decoder.decode_events(&mut &input[..]).unwrap();
-    }
 }

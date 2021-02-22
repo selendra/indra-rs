@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -23,8 +23,8 @@ use serde::de::DeserializeOwned;
 use sp_runtime::{
     traits::{
         AtLeast32Bit, AtLeast32BitUnsigned, Bounded, CheckEqual, Extrinsic, Hash, Header,
-        MaybeDisplay, MaybeMallocSizeOf, MaybeSerialize, MaybeSerializeDeserialize,
-        Member, SimpleBitOps,
+        MaybeDisplay, MaybeMallocSizeOf, MaybeSerialize, MaybeSerializeDeserialize, Member,
+        SimpleBitOps,
     },
     DispatchError,
 };

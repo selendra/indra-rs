@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -177,103 +177,5 @@ pub fn module(_args: TokenStream, tokens: TokenStream) -> TokenStream {
                 #(#types)*
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_balance_module() {
-        let attr = quote!(#[module]);
-        let input = quote! {
-            pub trait Balances: System {
-                type Balance: frame_support::Parameter
-                    + sp_runtime::traits::Member
-                    + sp_runtime::traits::AtLeast32Bit
-                    + codec::Codec
-                    + Default
-                    + Copy
-                    + sp_runtime::traits::MaybeSerialize
-                    + std::fmt::Debug
-                    + From<<Self as System>::BlockNumber>;
-            }
-        };
-        let expected = quote! {
-            pub trait Balances: System {
-                type Balance: frame_support::Parameter
-                    + sp_runtime::traits::Member
-                    + sp_runtime::traits::AtLeast32Bit
-                    + codec::Codec
-                    + Default
-                    + Copy
-                    + sp_runtime::traits::MaybeSerialize
-                    + std::fmt::Debug
-                    + From< <Self as System>::BlockNumber>;
-            }
-
-            const MODULE: &str = "Balances";
-
-            /// `EventsDecoder` extension trait.
-            pub trait BalancesEventsDecoder {
-                /// Registers this modules types.
-                fn with_balances(&mut self);
-            }
-
-            impl<T: Balances> BalancesEventsDecoder for
-                substrate_subxt::EventsDecoder<T>
-            {
-                fn with_balances(&mut self) {
-                    self.with_system();
-                    self.register_type_size::<T::Balance>("Balance");
-                }
-            }
-        };
-
-        let result = module(attr, input);
-        utils::assert_proc_macro(result, expected);
-    }
-
-    #[test]
-    fn test_herd() {
-        let attr = quote!(#[module]);
-        let input = quote! {
-            pub trait Herd: Husbandry {
-                type Hoves: u8;
-                type Wool: bool;
-                #[module(ignore)]
-                type Digestion: EnergyProducer + fmt::Debug;
-            }
-        };
-        let expected = quote! {
-            pub trait Herd: Husbandry {
-                type Hoves: u8;
-                type Wool: bool;
-                #[module(ignore)]
-                type Digestion: EnergyProducer + fmt::Debug;
-            }
-
-            const MODULE: &str = "Herd";
-
-            /// `EventsDecoder` extension trait.
-            pub trait HerdEventsDecoder {
-                /// Registers this modules types.
-                fn with_herd(&mut self);
-            }
-
-            impl<T: Herd> HerdEventsDecoder for
-                substrate_subxt::EventsDecoder<T>
-            {
-                fn with_herd(&mut self) {
-                    self.with_husbandry();
-                    self.register_type_size::<T::Hoves>("Hoves");
-                    self.register_type_size::<T::Wool>("Wool");
-                }
-            }
-        };
-
-        let result = module(attr, input);
-        utils::assert_proc_macro(result, expected);
     }
 }

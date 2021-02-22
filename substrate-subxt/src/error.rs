@@ -48,6 +48,13 @@ pub enum Error {
     /// Metadata error.
     #[error("Metadata error: {0}")]
     Metadata(#[from] MetadataError),
+    /// Unregistered type sizes.
+    #[error(
+        "The following types do not have a type size registered: \
+            {0:?} \
+         Use `ClientBuilder::register_type_size` to register missing type sizes."
+    )]
+    MissingTypeSizes(Vec<String>),
     /// Type size unavailable.
     #[error("Type size unavailable while decoding event: {0:?}")]
     TypeSizeUnavailable(String),
@@ -89,6 +96,12 @@ pub enum RuntimeError {
     /// Module error.
     #[error("Runtime module error: {0}")]
     Module(ModuleError),
+    /// At least one consumer is remaining so the account cannot be destroyed.
+    #[error("At least one consumer is remaining so the account cannot be destroyed.")]
+    ConsumerRemaining,
+    /// There are no providers so the account cannot be created.
+    #[error("There are no providers so the account cannot be created.")]
+    NoProviders,
     /// Bad origin.
     #[error("Bad origin: throw by ensure_signed, ensure_root or ensure_none.")]
     BadOrigin,
@@ -102,10 +115,7 @@ pub enum RuntimeError {
 
 impl RuntimeError {
     /// Converts a `DispatchError` into a subxt error.
-    pub fn from_dispatch(
-        metadata: &Metadata,
-        error: DispatchError,
-    ) -> Result<Self, Error> {
+    pub fn from_dispatch(metadata: &Metadata, error: DispatchError) -> Result<Self, Error> {
         match error {
             DispatchError::Module {
                 index,
@@ -121,6 +131,8 @@ impl RuntimeError {
             }
             DispatchError::BadOrigin => Ok(Self::BadOrigin),
             DispatchError::CannotLookup => Ok(Self::CannotLookup),
+            DispatchError::ConsumerRemaining => Ok(Self::ConsumerRemaining),
+            DispatchError::NoProviders => Ok(Self::NoProviders),
             DispatchError::Other(msg) => Ok(Self::Other(msg.into())),
         }
     }

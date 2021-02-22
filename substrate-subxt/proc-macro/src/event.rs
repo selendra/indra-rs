@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -47,44 +47,5 @@ pub fn event(s: Structure) -> TokenStream {
                 self.find_event()
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_transfer_event() {
-        let input = quote! {
-            #[derive(Debug, Decode, Eq, Event, PartialEq)]
-            pub struct TransferEvent<T: Balances> {
-                pub from: <T as System>::AccountId,
-                pub to: <T as System>::AccountId,
-                pub amount: T::Balance,
-            }
-        };
-        let expected = quote! {
-            impl<T: Balances> substrate_subxt::Event<T> for TransferEvent<T> {
-                const MODULE: &'static str = MODULE;
-                const EVENT: &'static str = "Transfer";
-            }
-
-            /// Event extension trait.
-            pub trait TransferEventExt<T: Balances> {
-                /// Retrieves the event.
-                fn transfer(&self) -> Result<Option<TransferEvent<T>>, codec::Error>;
-            }
-
-            impl<T: Balances> TransferEventExt<T> for substrate_subxt::ExtrinsicSuccess<T> {
-                fn transfer(&self) -> Result<Option<TransferEvent<T>>, codec::Error> {
-                    self.find_event()
-                }
-            }
-        };
-        let derive_input = syn::parse2(input).unwrap();
-        let s = Structure::new(&derive_input);
-        let result = event(s);
-        utils::assert_proc_macro(result, expected);
     }
 }

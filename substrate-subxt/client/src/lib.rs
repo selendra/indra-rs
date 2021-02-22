@@ -1,4 +1,4 @@
-// Copyright 2019-2021 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Parity Technologies (UK) Ltd.
 // This file is part of substrate-subxt.
 //
 // subxt is free software: you can redistribute it and/or modify
@@ -38,7 +38,8 @@ pub use sc_service::{
 };
 use sc_service::{
     config::{NetworkConfiguration, TaskType, TelemetryEndpoints},
-    ChainSpec, Configuration, RpcHandlers, RpcSession, TaskManager,
+    ChainSpec, Configuration, KeepBlocks, RpcHandlers, RpcSession, TaskManager,
+    TransactionStorageMode,
 };
 use std::{future::Future, pin::Pin};
 use thiserror::Error;
@@ -206,14 +207,11 @@ impl<C: ChainSpec + 'static> SubxtClientConfig<C> {
             enable_mdns: true,
             allow_private_ipv4: true,
             wasm_external_transport: None,
-            use_yamux_flow_control: true,
         };
         let telemetry_endpoints = if let Some(port) = self.telemetry {
-            let endpoints = TelemetryEndpoints::new(vec![(
-                format!("/ip4/127.0.0.1/tcp/{}/ws", port),
-                0,
-            )])
-            .expect("valid config; qed");
+            let endpoints =
+                TelemetryEndpoints::new(vec![(format!("/ip4/127.0.0.1/tcp/{}/ws", port), 0)])
+                    .expect("valid config; qed");
             Some(endpoints)
         } else {
             None
@@ -243,7 +241,7 @@ impl<C: ChainSpec + 'static> SubxtClientConfig<C> {
             force_authoring: Default::default(),
             offchain_worker: Default::default(),
             prometheus_config: Default::default(),
-            pruning: Default::default(),
+            state_pruning: Default::default(),
             rpc_cors: Default::default(),
             rpc_http: Default::default(),
             rpc_ipc: Default::default(),
@@ -258,6 +256,12 @@ impl<C: ChainSpec + 'static> SubxtClientConfig<C> {
             wasm_method: Default::default(),
             base_path: Default::default(),
             informant_output_format: Default::default(),
+            disable_log_reloading: Default::default(),
+            keystore_remote: Default::default(),
+            telemetry_handle: Default::default(),
+            transaction_storage: TransactionStorageMode::BlockBody,
+            wasm_runtime_overrides: Default::default(),
+            keep_blocks: KeepBlocks::All,
         };
 
         log::info!("{}", service_config.impl_name);
@@ -271,106 +275,5 @@ impl<C: ChainSpec + 'static> SubxtClientConfig<C> {
         log::info!("👤 Role: {:?}", self.role);
 
         service_config
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use async_std::path::Path;
-    use sp_keyring::AccountKeyring;
-    use substrate_subxt::{
-        balances::TransferCallExt, ClientBuilder,
-        IndracoreRuntime as NodeTemplateRuntime, PairSigner,
-    };
-    use tempdir::TempDir;
-
-    #[async_std::test]
-    #[ignore]
-    async fn test_client() {
-        env_logger::try_init().ok();
-        let client = ClientBuilder::<NodeTemplateRuntime>::new()
-            .build()
-            .await
-            .unwrap();
-        let signer = PairSigner::new(AccountKeyring::Alice.pair());
-        let to = AccountKeyring::Bob.to_account_id().into();
-        client
-            .transfer_and_watch(&signer, &to, 10_000)
-            .await
-            .unwrap();
-    }
-
-    #[async_std::test]
-    #[ignore]
-    async fn test_light_client() {
-        env_logger::try_init().ok();
-        let chain_spec_path =
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("dev-chain.json");
-        let bytes = async_std::fs::read(chain_spec_path).await.unwrap();
-        let chain_spec =
-            test_node::chain_spec::ChainSpec::from_json_bytes(bytes).unwrap();
-        let tmp = TempDir::new("subxt-").expect("failed to create tempdir");
-        let config = SubxtClientConfig {
-            // base_path:
-            impl_name: "substrate-subxt-light-client",
-            impl_version: "0.0.1",
-            author: "David Craven",
-            copyright_start_year: 2020,
-            db: DatabaseConfig::RocksDb {
-                path: tmp.path().into(),
-                cache_size: 64,
-            },
-            keystore: KeystoreConfig::InMemory,
-            chain_spec,
-            role: Role::Light,
-            telemetry: None,
-        };
-        let client = ClientBuilder::<NodeTemplateRuntime>::new()
-            .set_client(
-                SubxtClient::from_config(config, test_node::service::new_light).unwrap(),
-            )
-            .build()
-            .await
-            .unwrap();
-        let signer = PairSigner::new(AccountKeyring::Alice.pair());
-        let to = AccountKeyring::Bob.to_account_id().into();
-        client
-            .transfer_and_watch(&signer, &to, 10_000)
-            .await
-            .unwrap();
-    }
-
-    #[async_std::test]
-    async fn test_full_client() {
-        env_logger::try_init().ok();
-        let tmp = TempDir::new("subxt-").expect("failed to create tempdir");
-        let config = SubxtClientConfig {
-            impl_name: "substrate-subxt-full-client",
-            impl_version: "0.0.1",
-            author: "David Craven",
-            copyright_start_year: 2020,
-            db: DatabaseConfig::RocksDb {
-                path: tmp.path().into(),
-                cache_size: 128,
-            },
-            keystore: KeystoreConfig::InMemory,
-            chain_spec: test_node::chain_spec::development_config().unwrap(),
-            role: Role::Authority(AccountKeyring::Alice),
-            telemetry: None,
-        };
-        let client = ClientBuilder::<NodeTemplateRuntime>::new()
-            .set_client(
-                SubxtClient::from_config(config, test_node::service::new_full).unwrap(),
-            )
-            .build()
-            .await
-            .unwrap();
-        let signer = PairSigner::new(AccountKeyring::Alice.pair());
-        let to = AccountKeyring::Bob.to_account_id().into();
-        client
-            .transfer_and_watch(&signer, &to, 10_000)
-            .await
-            .unwrap();
     }
 }
