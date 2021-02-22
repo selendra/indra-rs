@@ -68,17 +68,6 @@ type EventAttr = utils::UniAttr<syn::Type>;
 type EventAliasAttr = utils::UniAttr<utils::Attr<syn::Ident, syn::Type>>;
 
 /// Parses the event type definition macros within #[module]
-///
-/// It supports two ways to define the associated event type:
-///
-/// ```ignore
-/// #[module]
-/// trait Pallet: System {
-///     #![event_type(SomeType)]
-///     #![event_alias(TypeNameAlias = SomeType)]
-///     #![event_alias(SomeOtherAlias = TypeWithAssociatedTypes<T>)]
-/// }
-/// ```
 fn parse_event_type_attr(attr: &syn::Attribute) -> Option<(String, syn::Type)> {
     let ident = utils::path_to_ident(&attr.path);
     if ident == "event_type" {
