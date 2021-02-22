@@ -51,7 +51,10 @@ impl Account {
         })
     }
 
-    pub fn get_account_info(url: &str, account_id: &'static str) -> Result<AccountInfo, Error> {
+    pub fn get_account_info(
+        url: &'static str,
+        account_id: &'static str,
+    ) -> Result<AccountInfo, Error> {
         async_std::task::block_on(async move {
             let client = match ClientBuilder::<IndracoreRuntime>::new()
                 .set_url(url)
