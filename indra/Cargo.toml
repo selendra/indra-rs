@@ -1,9 +1,0 @@
-[package]
-name = "indra-rs"
-version = "0.1.0"
-authors = ["Selendra <info@selendra.org>"]
-edition = "2018"
-
-[dependencies]
-substrate-subxt = { package = "substrate-subxt", path = "../substrate-subxt" }
-async-std = { version = "1.9.0", features = ["attributes"] }
