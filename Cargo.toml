@@ -17,9 +17,9 @@ async-std = { version = "1.9.0", features = ["attributes"] }
 
 [workspace]
 members = [
+    "indracore-subxt/proc-macro",
     "indracore-subxt",
     "indracore-subxt/client",
-    "indracore-subxt/proc-macro"
 ]
 
 [profile.release]

@@ -74,11 +74,11 @@ pub use crate::{
     events::{EventsDecoder, RawEvent},
     extrinsic::{PairSigner, SignedExtra, Signer, UncheckedExtrinsic},
     frame::*,
+    indra_proc_macro::*,
     metadata::{Metadata, MetadataError},
     rpc::{BlockNumber, ExtrinsicSuccess, ReadProof, SystemProperties},
     runtimes::*,
     subscription::*,
-    indra_proc_macro::*,
 };
 use crate::{
     frame::system::{AccountStoreExt, Phase, System},

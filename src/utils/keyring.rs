@@ -1,8 +1,8 @@
-use std::str::FromStr;
 use indracore_subxt::{
     sp_core::{crypto, sr25519, Pair as TraitPair},
     sp_runtime, Error, IndracoreRuntime, PairSigner,
 };
+use std::str::FromStr;
 
 type KusamaPairSigner = PairSigner<IndracoreRuntime, sr25519::Pair>;
 type MultiAddressId = sp_runtime::MultiAddress<crypto::AccountId32, ()>;
