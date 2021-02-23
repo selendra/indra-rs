@@ -3,11 +3,24 @@ name = "indra-rs"
 version = "0.1.0"
 authors = ["Selendra <info@selendra.org>"]
 edition = "2018"
-keywords = ["indracore", "substrate"]
+
+license = "GPL-3.0"
+readme = "README.md"
+repository = "https://github.com/selendra/indra-rs"
+homepage = "https://selendra.org"
+keywords = ["selendra", "substrate", "blockchain", "indracore"]
+include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
 
 [dependencies]
 indracore-subxt = { version = "0.1.0", package = "indracore-subxt", path = "indracore-subxt" }
 async-std = { version = "1.9.0", features = ["attributes"] }
+
+[workspace]
+members = [
+    "indracore-subxt",
+    "indracore-subxt/client",
+    "indracore-subxt/proc-macro"
+]
 
 [profile.release]
 panic = "unwind"
