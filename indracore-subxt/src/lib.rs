@@ -41,10 +41,10 @@
 #![allow(clippy::type_complexity)]
 
 #[macro_use]
-extern crate substrate_subxt_proc_macro;
+extern crate indra_proc_macro;
 
 #[cfg(feature = "client")]
-pub use substrate_subxt_client as client;
+pub use indra_client as client;
 
 pub use sp_core;
 pub use sp_runtime;
@@ -78,7 +78,7 @@ pub use crate::{
     rpc::{BlockNumber, ExtrinsicSuccess, ReadProof, SystemProperties},
     runtimes::*,
     subscription::*,
-    substrate_subxt_proc_macro::*,
+    indra_proc_macro::*,
 };
 use crate::{
     frame::system::{AccountStoreExt, Phase, System},

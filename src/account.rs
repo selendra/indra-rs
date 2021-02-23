@@ -1,5 +1,5 @@
 use crate::utils::keyring::IndraKeyring;
-use substrate_subxt::{system::AccountStoreExt, ClientBuilder, Error, IndracoreRuntime};
+use indracore_subxt::{system::AccountStoreExt, ClientBuilder, Error, IndracoreRuntime};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BalanceInfo {

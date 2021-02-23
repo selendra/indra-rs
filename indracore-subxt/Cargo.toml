@@ -1,21 +1,20 @@
 [package]
-name = "substrate-subxt"
-version = "0.14.0"
-authors = ["Parity Technologies <admin@parity.io>"]
+name = "indracore-subxt"
+version = "0.1.0"
+authors = ["Selendra <info@selendra.org>"]
 edition = "2018"
 
 license = "GPL-3.0"
 readme = "README.md"
-repository = "https://github.com/paritytech/substrate-subxt"
-documentation = "https://docs.rs/substrate-subxt"
-homepage = "https://www.parity.io/"
+repository = "https://github.com/selendra/indra-rs"
+homepage = "https://selendra.org"
 description = "Submit extrinsics (transactions) to a substrate node via RPC"
-keywords = ["parity", "substrate", "blockchain"]
+keywords = ["selendra", "substrate", "blockchain", "indracore"]
 include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
 
 [features]
 default = []
-client = ["substrate-subxt-client"]
+client = ["indra-client"]
 
 [dependencies]
 url = "2.2.0"
@@ -41,5 +40,5 @@ sp-std = { git = "https://github.com/selendra/substrate.git", branch = "v2.0.2" 
 sp-rpc = { git = "https://github.com/selendra/substrate.git", branch = "v2.0.2", package = "sp-rpc" }
 sp-core = { git = "https://github.com/selendra/substrate.git", branch = "v2.0.2", package = "sp-core" }
 
-substrate-subxt-client = { version = "0.6.0", path = "client", optional = true }
-substrate-subxt-proc-macro = { version = "0.14.0", path = "proc-macro" }
+indra-client = { version = "0.1.0", path = "client", optional = true }
+indra-proc-macro = { version = "0.1.0", path = "proc-macro" }

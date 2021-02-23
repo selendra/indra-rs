@@ -6,7 +6,7 @@ edition = "2018"
 keywords = ["indracore", "substrate"]
 
 [dependencies]
-substrate-subxt = { version = "0.14.0", package = "substrate-subxt", path = "substrate-subxt" }
+indracore-subxt = { version = "0.1.0", package = "indracore-subxt", path = "indracore-subxt" }
 async-std = { version = "1.9.0", features = ["attributes"] }
 
 [profile.release]

@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use substrate_subxt::{
+use indracore_subxt::{
     sp_core::{crypto, sr25519, Pair as TraitPair},
     sp_runtime, Error, IndracoreRuntime, PairSigner,
 };

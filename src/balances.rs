@@ -1,5 +1,5 @@
 use crate::utils::keyring::IndraKeyring;
-use substrate_subxt::{balances::*, system::*, ClientBuilder, Error, IndracoreRuntime};
+use indracore_subxt::{balances::*, system::*, ClientBuilder, Error, IndracoreRuntime};
 
 pub struct Balance {}
 

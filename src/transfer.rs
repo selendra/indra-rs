@@ -1,5 +1,5 @@
 use crate::utils::keyring::IndraKeyring;
-use substrate_subxt::{balances::*, sp_core::H256, ClientBuilder, Error, IndracoreRuntime};
+use indracore_subxt::{balances::*, sp_core::H256, ClientBuilder, Error, IndracoreRuntime};
 
 #[derive(Debug)]
 pub struct Transfer {
