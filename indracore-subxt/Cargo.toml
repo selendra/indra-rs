@@ -14,7 +14,7 @@ include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
 
 [features]
 default = []
-# client = ["indra-client"]
+client = ["indra-client"]
 
 [dependencies]
 url = "2.2.0"
@@ -40,5 +40,5 @@ sp-std = { git = "https://github.com/selendra/substrate.git", branch = "v2.0.2" 
 sp-rpc = { git = "https://github.com/selendra/substrate.git", branch = "v2.0.2", package = "sp-rpc" }
 sp-core = { git = "https://github.com/selendra/substrate.git", branch = "v2.0.2", package = "sp-core" }
 
-# indra-client = { version = "0.1.0", path = "client", optional = true }
+indra-client = { version = "0.1.0", path = "client", optional = true }
 indra-proc-macro = { version = "0.1.0", path = "proc-macro" }
