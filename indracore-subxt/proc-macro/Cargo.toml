@@ -20,5 +20,5 @@ proc-macro2 = "1.0.24"
 proc-macro-crate = "0.1.5"
 proc-macro-error = "1.0.4"
 quote = "1.0.8"
-syn = "1.0.58"
+syn = { version = "1.0.58", features = ["full", "extra-traits"] }
 synstructure = "0.12.4"

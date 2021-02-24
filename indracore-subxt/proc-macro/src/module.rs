@@ -116,7 +116,7 @@ pub fn module(_args: TokenStream, tokens: TokenStream) -> TokenStream {
 
     let bounds = input.supertraits.iter().filter_map(|bound| {
         if let syn::TypeParamBound::Trait(syn::TraitBound { path, .. }) = bound {
-            let module = utils::path_to_ident(path);
+            let module = utils::path_to_ident(&path);
             let with_module = with_module_ident(module);
             Some(quote! {
                 self.#with_module();
